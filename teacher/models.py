@@ -1,6 +1,3 @@
-
-
-# Create your models here.
 # This is an auto-generated Django model module.
 # You'll have to do the following manually to clean this up:
 #   * Rearrange models' order
@@ -12,7 +9,7 @@ from django.db import models
 
 
 class Activities(models.Model):
-    activity_id = models.IntegerField(primary_key=True)
+    activity_id = models.AutoField(primary_key=True)
     activity_type = models.CharField(max_length=20, blank=True, null=True)
     activity_start_date = models.DateTimeField(blank=True, null=True)
     activity_end_date = models.DateTimeField(blank=True, null=True)
@@ -24,7 +21,7 @@ class Activities(models.Model):
 
 
 class Activityassignments(models.Model):
-    assignment_id = models.IntegerField(primary_key=True)
+    assignment_id = models.AutoField(primary_key=True)
     teacher = models.ForeignKey('Teachers', models.DO_NOTHING, blank=True, null=True)
     course = models.ForeignKey('Courses', models.DO_NOTHING, blank=True, null=True)
     laboratory = models.ForeignKey('Laboratories', models.DO_NOTHING, blank=True, null=True)
@@ -33,6 +30,16 @@ class Activityassignments(models.Model):
     class Meta:
         managed = False
         db_table = 'ActivityAssignments'
+
+
+class Activityregistrations(models.Model):
+    registration_id = models.AutoField(primary_key=True)
+    activity = models.ForeignKey('Groupactivities', models.DO_NOTHING, blank=True, null=True)
+    student = models.ForeignKey('Students', models.DO_NOTHING, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'ActivityRegistrations'
 
 
 class Admins(models.Model):
@@ -55,7 +62,7 @@ class Authentications(models.Model):
 
 
 class Courses(models.Model):
-    course_id = models.IntegerField(primary_key=True)
+    course_id = models.AutoField(primary_key=True)
     course_name = models.CharField(max_length=15, blank=True, null=True)
     course_description = models.CharField(max_length=100, blank=True, null=True)
     course_max_students = models.IntegerField(blank=True, null=True)
@@ -66,7 +73,7 @@ class Courses(models.Model):
 
 
 class Enrollments(models.Model):
-    enrollment_id = models.IntegerField(primary_key=True)
+    enrollment_id = models.AutoField(primary_key=True)
     student = models.ForeignKey('Students', models.DO_NOTHING, blank=True, null=True)
     activity = models.ForeignKey(Activities, models.DO_NOTHING, blank=True, null=True)
 
@@ -76,7 +83,7 @@ class Enrollments(models.Model):
 
 
 class Grades(models.Model):
-    grade_id = models.IntegerField(primary_key=True)
+    grade_id = models.AutoField(primary_key=True)
     student = models.ForeignKey('Students', models.DO_NOTHING, blank=True, null=True)
     activity = models.ForeignKey(Activities, models.DO_NOTHING, blank=True, null=True)
     grade_course = models.IntegerField(blank=True, null=True)
@@ -104,16 +111,6 @@ class Groupactivities(models.Model):
         db_table = 'GroupActivities'
 
 
-class Groupactivityregistrations(models.Model):
-    registration_id = models.AutoField(primary_key=True)
-    activity = models.ForeignKey(Groupactivities, models.DO_NOTHING, blank=True, null=True)
-    student = models.ForeignKey('Students', models.DO_NOTHING, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'GroupActivityRegistrations'
-
-
 class Groupmembers(models.Model):
     member_id = models.AutoField(primary_key=True)
     group = models.ForeignKey('Studygroups', models.DO_NOTHING, blank=True, null=True)
@@ -137,7 +134,7 @@ class Groupmessages(models.Model):
 
 
 class Laboratories(models.Model):
-    laboratory_id = models.IntegerField(primary_key=True)
+    laboratory_id = models.AutoField(primary_key=True)
     laboratory_name = models.CharField(max_length=15, blank=True, null=True)
     laboratory_description = models.CharField(max_length=100, blank=True, null=True)
     laboratory_max_students = models.IntegerField(blank=True, null=True)
@@ -148,7 +145,7 @@ class Laboratories(models.Model):
 
 
 class Seminars(models.Model):
-    seminar_id = models.IntegerField(primary_key=True)
+    seminar_id = models.AutoField(primary_key=True)
     seminar_name = models.CharField(max_length=15, blank=True, null=True)
     seminar_description = models.CharField(max_length=100, blank=True, null=True)
     seminar_max_students = models.IntegerField(blank=True, null=True)
@@ -208,122 +205,8 @@ class Users(models.Model):
     user_iban = models.CharField(db_column='user_IBAN', unique=True, max_length=30)  # Field name made lowercase.
     user_contract_number = models.IntegerField(unique=True)
     user_type = models.CharField(max_length=15)
-    last_login = models.DateTimeField(auto_now=True)
+    last_login = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'Users'
-
-
-class AuthGroup(models.Model):
-    name = models.CharField(unique=True, max_length=150)
-
-    class Meta:
-        managed = False
-        db_table = 'auth_group'
-
-
-class AuthGroupPermissions(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    group = models.ForeignKey(AuthGroup, models.DO_NOTHING)
-    permission = models.ForeignKey('AuthPermission', models.DO_NOTHING)
-
-    class Meta:
-        managed = False
-        db_table = 'auth_group_permissions'
-        unique_together = (('group', 'permission'),)
-
-
-class AuthPermission(models.Model):
-    name = models.CharField(max_length=255)
-    content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING)
-    codename = models.CharField(max_length=100)
-
-    class Meta:
-        managed = False
-        db_table = 'auth_permission'
-        unique_together = (('content_type', 'codename'),)
-
-
-class AuthUser(models.Model):
-    password = models.CharField(max_length=128)
-    last_login = models.DateTimeField(blank=True, null=True)
-    is_superuser = models.IntegerField()
-    username = models.CharField(unique=True, max_length=150)
-    first_name = models.CharField(max_length=150)
-    last_name = models.CharField(max_length=150)
-    email = models.CharField(max_length=254)
-    is_staff = models.IntegerField()
-    is_active = models.IntegerField()
-    date_joined = models.DateTimeField()
-
-    class Meta:
-        managed = False
-        db_table = 'auth_user'
-
-
-class AuthUserGroups(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    user = models.ForeignKey(AuthUser, models.DO_NOTHING)
-    group = models.ForeignKey(AuthGroup, models.DO_NOTHING)
-
-    class Meta:
-        managed = False
-        db_table = 'auth_user_groups'
-        unique_together = (('user', 'group'),)
-
-
-class AuthUserUserPermissions(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    user = models.ForeignKey(AuthUser, models.DO_NOTHING)
-    permission = models.ForeignKey(AuthPermission, models.DO_NOTHING)
-
-    class Meta:
-        managed = False
-        db_table = 'auth_user_user_permissions'
-        unique_together = (('user', 'permission'),)
-
-
-class DjangoAdminLog(models.Model):
-    action_time = models.DateTimeField()
-    object_id = models.TextField(blank=True, null=True)
-    object_repr = models.CharField(max_length=200)
-    action_flag = models.PositiveSmallIntegerField()
-    change_message = models.TextField()
-    content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, blank=True, null=True)
-    user = models.ForeignKey(AuthUser, models.DO_NOTHING)
-
-    class Meta:
-        managed = False
-        db_table = 'django_admin_log'
-
-
-class DjangoContentType(models.Model):
-    app_label = models.CharField(max_length=100)
-    model = models.CharField(max_length=100)
-
-    class Meta:
-        managed = False
-        db_table = 'django_content_type'
-        unique_together = (('app_label', 'model'),)
-
-
-class DjangoMigrations(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    app = models.CharField(max_length=255)
-    name = models.CharField(max_length=255)
-    applied = models.DateTimeField()
-
-    class Meta:
-        managed = False
-        db_table = 'django_migrations'
-
-
-class DjangoSession(models.Model):
-    session_key = models.CharField(primary_key=True, max_length=40)
-    session_data = models.TextField()
-    expire_date = models.DateTimeField()
-
-    class Meta:
-        managed = False
-        db_table = 'django_session'

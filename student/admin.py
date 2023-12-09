@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import Activities, Activityassignments, Admins, Authentications
 from .models import Courses, Enrollments, Grades, Groupactivities
-from .models import Groupactivityregistrations, Groupmembers, Groupmessages
+from .models import Groupmembers, Groupmessages
 from .models import Laboratories, Seminars, Students, Studygroups, Superadmins
 from .models import Teachers, Users
 # Register your models here.
@@ -14,7 +14,6 @@ admin.site.register(Courses)
 admin.site.register(Enrollments)
 admin.site.register(Grades)
 admin.site.register(Groupactivities)
-admin.site.register(Groupactivityregistrations)
 admin.site.register(Groupmembers)
 admin.site.register(Groupmessages)
 admin.site.register(Laboratories)

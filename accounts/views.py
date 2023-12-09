@@ -1,4 +1,3 @@
-
 # Create your views here.
 from django.shortcuts import render
 from django.contrib.auth.models import User
@@ -12,10 +11,12 @@ from django.core.exceptions import ValidationError
 import traceback
 from django.core.exceptions import ObjectDoesNotExist
 
+
 # Create your views here.
 
 def generate_random_string(length):
     return ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(length))
+
 
 def home(request):
     return render(request, 'accounts/index.html')
@@ -85,6 +86,14 @@ def signin(request):
         if user is not None:
             login(request, user)
             messages.success(request, "You have successfully logged in")
+
+            # check if user == student
+            role = user.user_type
+            if role == 'student':
+                return render(request, 'student/student.html')
+            elif role == 'teacher':
+                return render(request, 'teacher/teacher.html')
+
             return render(request, 'accounts/index.html')
         else:
             messages.error(request, "Invalid Credentials, Please try again")
