@@ -29,7 +29,7 @@ def signup(request):
 
         messages.success(request, "Your account has been successfully created")
 
-        return redirect('signin')
+        return redirect('home')
 
     return render(request, 'auth/signup.html')
 
@@ -47,7 +47,7 @@ def signin(request):
             return redirect('home')
         else:
             messages.error(request, "Invalid Credentials, Please try again")
-            return redirect('signin')
+            return render(request, 'auth/signin.html')
 
     return render(request, 'auth/signin.html')
 
