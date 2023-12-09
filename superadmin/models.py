@@ -205,6 +205,7 @@ class Users(models.Model):
     user_iban = models.CharField(db_column='user_IBAN', unique=True, max_length=30)  # Field name made lowercase.
     user_contract_number = models.IntegerField(unique=True)
     user_type = models.CharField(max_length=15)
+    last_login = models.DateTimeField(auto_now=True)
 
     class Meta:
         managed = False
