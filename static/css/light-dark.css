@@ -1,0 +1,114 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+:root {
+    --foreground: black;
+    --background: white;
+}
+
+body {
+    background-color: var(--background);
+    color: var(--foreground);
+}
+
+body.darkmode {
+    background-color: var(--foreground);
+    color: var(--background);
+}
+
+body.darkmode a {
+    color: white !important;
+}
+
+h1 {
+    font-size: calc(3rem + 7vw);
+    font-family: "Playfair Display", serif;
+    margin: 0 0 0.25em;
+    line-height: 1;
+}
+
+.btn-group {
+    margin: 2em 0;
+    position: relative;
+}
+
+.btn {
+    padding: 1em 2em;
+    text-decoration: none;
+    text-transform: uppercase;
+    border-radius: 5px;
+    position: relative;
+    display: inline-block;
+    line-height: 1;
+}
+
+.btn + .btn {
+    margin-left: 1em;
+}
+
+.btn-secondary {
+    background: #000000;
+    color: #000000;
+}
+
+.btn-accent {
+    background: #ffffff;
+    color: #000000;
+}
+
+.btn::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: -4px;
+    top: 4px;
+    border-radius: inherit;
+    z-index: -1;
+}
+
+.intro {
+    height: 80vh;
+    padding: 10em 0;
+    display: grid;
+    grid-template-columns: minmax(2em, 1fr) minmax(80vw, 860px) minmax(2em, 1fr);
+    background: linear-gradient(120deg, white, #00100d);
+    align-content: center;
+}
+
+.intro > * {
+    grid-column: 2 / 3;
+}
+
+.dark-mode-toggle {
+    position: absolute;
+    z-index: 100;
+    top: 1em;
+    right: 1em;
+    color: var(--foreground);
+    border: 2px solid var(--foreground);
+    padding: 4px;
+    background: transparent;
+    cursor: pointer;
+    border-radius: 5px;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+body.darkmode .dark-mode-toggle {
+    color: var(--background);
+    border: 2px solid var(--background);
+}
+
+.click-here {
+    width: 100px;
+    right: 1.5em;
+    position: absolute;
+    top: 3em;
+}
