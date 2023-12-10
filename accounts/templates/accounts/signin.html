@@ -28,7 +28,7 @@
 <body>
 <div class="container">
 	<h1 class="text-center mt-5"><strong><em>Sign In</em></strong></h1>
-	<form action="{% url 'signin' %}" method="post">
+	<form action="{% url 'accounts:signin' %}" method="post">
 		{% csrf_token %}
 		<div class="container">
 			<div class="form-container col-md-6 mx-auto">
@@ -46,7 +46,7 @@
 				<button type="submit" class="btn btn-red">Sign In</button>
 			</div>
 			<div class="d-flex justify-content-center align-items-center mt-3">
-				<a href="{% url 'signup' %}"
+				<a href="{% url 'accounts:signup' %}"
 				   class="text-decoration-none text-dark px-2 py-1 border border-dark rounded d-block w-100">Do not
 																											 already
 																											 have an

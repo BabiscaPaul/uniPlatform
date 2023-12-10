@@ -67,7 +67,7 @@ def signup(request):
             return render(request, 'accounts/signup.html')
 
         messages.success(request, "Your account has been successfully created")
-        return redirect('home')
+        return redirect('accounts:signin')
 
     return render(request, 'accounts/signup.html')
 
@@ -84,7 +84,7 @@ def signin(request):
             user = None
 
         if user is not None:
-            login(request, user)
+            request.session['user_id'] = user.user_id  # log the user in
             messages.success(request, "You have successfully logged in")
 
             # check if user == student
@@ -103,4 +103,5 @@ def signin(request):
 
 
 def signout(request):
-    pass
+    request.session.flush()
+    return redirect('accounts:signin')
