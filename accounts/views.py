@@ -17,11 +17,6 @@ from django.core.exceptions import ObjectDoesNotExist
 def generate_random_string(length):
     return ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(length))
 
-
-def home(request):
-    return render(request, 'accounts/index.html')
-
-
 def signup(request):
     if request.method == "POST":
         username = request.POST['username']
@@ -90,11 +85,9 @@ def signin(request):
             # check if user == student
             role = user.user_type
             if role == 'student':
-                return render(request, 'student/student.html')
+                return render(request, '{% url "student:student" %}')
             elif role == 'teacher':
-                return render(request, 'teacher/teacher.html')
-
-            return render(request, 'accounts/index.html')
+                return render(request, '{% url "teacher:teacher" %}')
         else:
             messages.error(request, "Invalid Credentials, Please try again")
             return render(request, 'accounts/signin.html')

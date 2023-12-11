@@ -112,3 +112,8 @@ body.darkmode .dark-mode-toggle {
     position: absolute;
     top: 3em;
 }
+
+body.darkmode #signup-btn a:hover, #signin-btn:hover, #create-acc:hover{
+    background-color: white;
+    color: black !important;
+}
