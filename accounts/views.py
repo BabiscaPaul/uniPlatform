@@ -85,9 +85,9 @@ def signin(request):
             # check if user == student
             role = user.user_type
             if role == 'student':
-                return render(request, '{% url "student:student" %}')
+                return render(request, 'student/student.html')
             elif role == 'teacher':
-                return render(request, '{% url "teacher:teacher" %}')
+                return render(request, 'teacher/teacher.html')
         else:
             messages.error(request, "Invalid Credentials, Please try again")
             return render(request, 'accounts/signin.html')
