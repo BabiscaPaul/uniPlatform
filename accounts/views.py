@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.contrib.auth import authenticate, login, logout
-from .models import Authentications, Users
+from sharedmodels.models import Authentications, Users
 import random
 import string
 from django.core.exceptions import ValidationError

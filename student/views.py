@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponseForbidden
-from accounts.models import Authentications, Users
+from sharedmodels.models import Authentications, Users
 from django.views.decorators.cache import cache_control
 
 

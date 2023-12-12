@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'superadmin',
     'adminDB',
     'accounts',
+    'sharedmodels',
 ]
 
 MIDDLEWARE = [
