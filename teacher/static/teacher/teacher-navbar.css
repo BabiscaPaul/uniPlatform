@@ -1,0 +1,7 @@
+.nav-item .logout {
+    color: #9b1616;
+}
+
+.nav-item .logout:hover {
+    color: red;
+}

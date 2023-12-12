@@ -73,7 +73,7 @@ def signin(request):
                 if role == 'student':
                     return redirect('student:student-home')
                 elif role == 'teacher':
-                    return redirect('teacher:teacher')
+                    return redirect('teacher:teacher-home')
         except ObjectDoesNotExist:
             messages.error(request, "Invalid Credentials, Please try again")
             return redirect('accounts:signin')
