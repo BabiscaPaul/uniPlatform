@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.contrib.auth import authenticate, login, logout
-from sharedmodels.models import Authentications, Users
+from sharedmodels.models import Authentications, Users, Teachers, Students
 import random
 import string
 from django.core.exceptions import ValidationError
@@ -14,10 +14,6 @@ from django.contrib.auth.forms import UserCreationForm
 
 
 # Create your views here.
-
-def generate_random_string(length):
-    return ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(length))
-
 
 def signup(request):
     if request.method == "POST":
@@ -50,6 +46,24 @@ def signup(request):
         myauth.save()
 
         messages.success(request, "Your account has been successfully created")
+
+        if role == 'teacher':
+            teacher = Teachers(
+                teacher=myusers,
+                teacher_department='your department',
+                teacher_min_hours=0,
+                teacher_max_hours=0
+            )
+            teacher.save();
+
+        elif role == 'student':
+            student = Students(
+                student=myusers,
+                student_study_year=0,
+                student_hours=0
+            )
+            student.save();
+
         return redirect('accounts:signin')
 
     return render(request, 'accounts/signup.html')
