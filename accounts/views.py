@@ -29,44 +29,31 @@ def signup(request):
         passwordConfirm = request.POST['passwordConfirm']
         role = request.POST['role']
 
-        try:
-            myusers = Users(
-                user_pic=generate_random_string(20),
-                user_first_name=fname,
-                user_last_name=lname,
-                user_address='c',
-                user_phone_number=generate_random_string(20),
-                user_email=email,
-                user_iban=generate_random_string(30),
-                user_type=role,
-                user_contract_number=random.randint(1, 1000000),
-            )
-            print(myusers)
-            myusers.full_clean()
-            myusers.save()
+        myusers = Users(
+            user_pic="your pic",
+            user_first_name=fname,
+            user_last_name=lname,
+            user_address='your address',
+            user_phone_number='your phone number',
+            user_email=email,
+            user_iban='your iban',
+            user_type=role,
+            user_contract_number=0
+        )
+        myusers.save()
 
-            myauth = Authentications(
-                user=myusers,
-                authentication_username=username,
-                authentication_password=password,
-            )
-            print(myauth)
-            myauth.full_clean()
-            myauth.save()
-        except ValidationError as e:
-            print(f"Validation error: {e}")
-            messages.error(request, f"Error when validating data: {e}")
-            return render(request, 'accounts/signup.html')
-        except Exception as e:
-            print(f"Error when saving Users or Authentications instance: {e}")
-            traceback.print_exc()
-            messages.error(request, f"Error when saving Users or Authentications instance: {e}")
-            return render(request, 'accounts/signup.html')
+        myauth = Authentications(
+            user=myusers,
+            authentication_username=username,
+            authentication_password=password,
+        )
+        myauth.save()
 
         messages.success(request, "Your account has been successfully created")
         return redirect('accounts:signin')
 
     return render(request, 'accounts/signup.html')
+
 
 def signin(request):
     if request.method == "POST":
@@ -76,22 +63,20 @@ def signin(request):
         try:
             user_auth = Authentications.objects.get(authentication_username=username, authentication_password=password)
             user = user_auth.user
+
+            if user is not None:
+                request.session['user_id'] = user.user_id  # log the user in
+                messages.success(request, "You have successfully logged in")
+
+                # check if user == student
+                role = user.user_type
+                if role == 'student':
+                    return redirect('student:student-home')
+                elif role == 'teacher':
+                    return redirect('teacher:teacher')
         except ObjectDoesNotExist:
-            user = None
-
-        if user is not None:
-            request.session['user_id'] = user.user_id  # log the user in
-            messages.success(request, "You have successfully logged in")
-
-            # check if user == student
-            role = user.user_type
-            if role == 'student':
-                return redirect('student:student')
-            elif role == 'teacher':
-                return redirect('teacher:teacher')
-        else:
             messages.error(request, "Invalid Credentials, Please try again")
-            return render(request, 'accounts/signin.html')
+            return redirect('accounts:signin')
 
     return render(request, 'accounts/signin.html')
 
@@ -99,7 +84,3 @@ def signin(request):
 def signout(request):
     request.session.flush()
     return redirect('accounts:signin')
-
-########################################################
-
-# def betterSignUp:

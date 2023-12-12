@@ -3,6 +3,7 @@ from django.http import HttpResponseForbidden
 from accounts.models import Authentications, Users
 from django.views.decorators.cache import cache_control
 
+
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def student(request):
     if 'user_id' not in request.session:
