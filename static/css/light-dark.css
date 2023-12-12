@@ -109,8 +109,7 @@ body.darkmode .dark-mode-toggle {
     top: 3em;
 }
 
-body.darkmode #signup-btn a:hover, body.darkmode .btn-red:hover, body.darkmode #create-acc:hover{
+body.darkmode #signup-btn a:hover, body.darkmode .btn-red:hover, body.darkmode #create-acc:hover {
     background-color: white;
     color: black !important;
 }
-

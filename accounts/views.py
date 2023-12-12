@@ -10,12 +10,14 @@ import string
 from django.core.exceptions import ValidationError
 import traceback
 from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.forms import UserCreationForm
 
 
 # Create your views here.
 
 def generate_random_string(length):
     return ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(length))
+
 
 def signup(request):
     if request.method == "POST":
@@ -85,9 +87,9 @@ def signin(request):
             # check if user == student
             role = user.user_type
             if role == 'student':
-                return render(request, 'student/student.html')
+                return redirect('student:student')
             elif role == 'teacher':
-                return render(request, 'teacher/teacher.html')
+                return redirect('teacher:teacher')
         else:
             messages.error(request, "Invalid Credentials, Please try again")
             return render(request, 'accounts/signin.html')
@@ -98,3 +100,7 @@ def signin(request):
 def signout(request):
     request.session.flush()
     return redirect('accounts:signin')
+
+########################################################
+
+# def betterSignUp:
