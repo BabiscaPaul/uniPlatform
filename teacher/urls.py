@@ -6,4 +6,10 @@ app_name = 'teacher'
 
 urlpatterns = [
     path('teacher-home/', views.teacher, name='teacher-home'),
+    path('teacher-profile/', views.teacherProfile, name='teacher-profile'),
+    path('teacher-activities/', views.teacherActivities, name='teacher-activities'),
+    path('teacher-create-activity/', views.teacherCreateActivity, name='teacher-create-activity'),
+    path('teacher-download-activities/', views.teacherDownloadActivities, name='teacher-download-activities'),
+    path('teacher-students-list/', views.teacherStudentsList, name='teacher-students-list'),
+    path('teacher-assign-activity/', views.teacherAssignActivity, name='teacher-assign-activity'),
 ]
