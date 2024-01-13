@@ -7,13 +7,13 @@
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
 
-
 class Activities(models.Model):
     activity_id = models.AutoField(primary_key=True)
     activity_type = models.CharField(max_length=20, blank=True, null=True)
     activity_start_date = models.DateTimeField(blank=True, null=True)
     activity_end_date = models.DateTimeField(blank=True, null=True)
     activity_max_students = models.IntegerField(blank=True, null=True)
+    activity_created_by = models.ForeignKey('Users', on_delete=models.CASCADE, null=True)
 
     class Meta:
         managed = False
