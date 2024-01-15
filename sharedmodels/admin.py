@@ -3,7 +3,8 @@ from .models import Activities, Activityassignments, Admins, Authentications
 from .models import Courses, Enrollments, Grades, Groupactivities
 from .models import Groupmembers, Groupmessages
 from .models import Laboratories, Seminars, Students, Studygroups, Superadmins
-from .models import Teachers, Users
+from .models import Teachers, Users, Studentenrollments
+
 # Register your models here.
 
 admin.site.register(Activities)
@@ -23,3 +24,4 @@ admin.site.register(Studygroups)
 admin.site.register(Superadmins)
 admin.site.register(Teachers)
 admin.site.register(Users)
+admin.site.register(Studentenrollments)

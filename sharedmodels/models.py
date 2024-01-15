@@ -27,6 +27,9 @@ class Activityassignments(models.Model):
     course = models.ForeignKey('Courses', models.DO_NOTHING, blank=True, null=True)
     laboratory = models.ForeignKey('Laboratories', models.DO_NOTHING, blank=True, null=True)
     seminar = models.ForeignKey('Seminars', models.DO_NOTHING, blank=True, null=True)
+    course_weight = models.IntegerField(blank=True, null=True)
+    laboratory_weight = models.IntegerField(blank=True, null=True)
+    seminar_weight = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False
@@ -54,7 +57,7 @@ class Admins(models.Model):
 class Authentications(models.Model):
     authentication_id = models.AutoField(primary_key=True)
     user = models.ForeignKey('Users', models.DO_NOTHING, blank=True, null=True)
-    authentication_username = models.CharField(unique=True, max_length=15)
+    authentication_username = models.CharField(max_length=15)
     authentication_password = models.CharField(max_length=15)
 
     class Meta:
@@ -66,7 +69,6 @@ class Courses(models.Model):
     course_id = models.AutoField(primary_key=True)
     course_name = models.CharField(max_length=15, blank=True, null=True)
     course_description = models.CharField(max_length=100, blank=True, null=True)
-    course_max_students = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False
@@ -86,11 +88,10 @@ class Enrollments(models.Model):
 class Grades(models.Model):
     grade_id = models.AutoField(primary_key=True)
     student = models.ForeignKey('Students', models.DO_NOTHING, blank=True, null=True)
-    activity = models.ForeignKey(Activities, models.DO_NOTHING, blank=True, null=True)
-    grade_course = models.IntegerField(blank=True, null=True)
-    grade_laboratory = models.IntegerField(blank=True, null=True)
-    grade_seminar = models.IntegerField(blank=True, null=True)
-    grade_final = models.IntegerField(blank=True, null=True)
+    grade_value = models.IntegerField(blank=True, null=True)
+    course = models.ForeignKey(Courses, models.DO_NOTHING, blank=True, null=True)
+    laboratory = models.ForeignKey('Laboratories', models.DO_NOTHING, blank=True, null=True)
+    seminar = models.ForeignKey('Seminars', models.DO_NOTHING, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -138,7 +139,6 @@ class Laboratories(models.Model):
     laboratory_id = models.AutoField(primary_key=True)
     laboratory_name = models.CharField(max_length=15, blank=True, null=True)
     laboratory_description = models.CharField(max_length=100, blank=True, null=True)
-    laboratory_max_students = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False
@@ -149,11 +149,20 @@ class Seminars(models.Model):
     seminar_id = models.AutoField(primary_key=True)
     seminar_name = models.CharField(max_length=15, blank=True, null=True)
     seminar_description = models.CharField(max_length=100, blank=True, null=True)
-    seminar_max_students = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'Seminars'
+
+
+class Studentenrollments(models.Model):
+    student_enrollment_id = models.AutoField(primary_key=True)
+    student = models.ForeignKey('Students', models.DO_NOTHING, blank=True, null=True)
+    teacher = models.ForeignKey('Teachers', models.DO_NOTHING, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'StudentEnrollments'
 
 
 class Students(models.Model):
@@ -197,14 +206,14 @@ class Teachers(models.Model):
 
 class Users(models.Model):
     user_id = models.AutoField(primary_key=True)
-    user_pic = models.CharField(db_column='user_PIC', unique=True, max_length=20)  # Field name made lowercase.
+    user_pic = models.CharField(db_column='user_PIC', max_length=20)  # Field name made lowercase.
     user_first_name = models.CharField(max_length=20)
     user_last_name = models.CharField(max_length=20)
     user_address = models.CharField(max_length=50)
-    user_phone_number = models.CharField(unique=True, max_length=20)
+    user_phone_number = models.CharField(max_length=20)
     user_email = models.CharField(max_length=50)
-    user_iban = models.CharField(db_column='user_IBAN', unique=True, max_length=30)  # Field name made lowercase.
-    user_contract_number = models.IntegerField(unique=True)
+    user_iban = models.CharField(db_column='user_IBAN', max_length=30)  # Field name made lowercase.
+    user_contract_number = models.IntegerField()
     user_type = models.CharField(max_length=15)
     last_login = models.DateTimeField(blank=True, null=True)
 
