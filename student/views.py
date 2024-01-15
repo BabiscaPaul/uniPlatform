@@ -81,3 +81,25 @@ def enroll(request):
         # ...
 
     return redirect('student:student-courses')
+
+
+def activities(request):
+    isUserStudent(request)
+
+    user_id = request.session['user_id']
+    # Fetch the enrollments for the student
+    enrollments = Studentenrollments.objects.filter(student__student__user_id=user_id)
+    # Fetch the courses for the enrollments
+    departments = [enrollment.teacher.teacher_department for enrollment in enrollments]
+
+    courses = Courses.objects.filter(course_name__in=departments)
+    labs = Laboratories.objects.filter(laboratory_name__in=departments)
+    seminars = Seminars.objects.filter(seminar_name__in=departments)
+
+    context = {
+        'courses': courses,
+        'labs': labs,
+        'seminars': seminars,
+    }
+
+    return render(request, 'student/student-activities.html', context)

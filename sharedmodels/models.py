@@ -69,6 +69,8 @@ class Courses(models.Model):
     course_id = models.AutoField(primary_key=True)
     course_name = models.CharField(max_length=15, blank=True, null=True)
     course_description = models.CharField(max_length=100, blank=True, null=True)
+    start_time = models.DateTimeField(blank=True, null=True)
+    end_time = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         managed = False
@@ -139,6 +141,8 @@ class Laboratories(models.Model):
     laboratory_id = models.AutoField(primary_key=True)
     laboratory_name = models.CharField(max_length=15, blank=True, null=True)
     laboratory_description = models.CharField(max_length=100, blank=True, null=True)
+    start_time = models.DateTimeField(blank=True, null=True)
+    end_time = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         managed = False
@@ -149,6 +153,8 @@ class Seminars(models.Model):
     seminar_id = models.AutoField(primary_key=True)
     seminar_name = models.CharField(max_length=15, blank=True, null=True)
     seminar_description = models.CharField(max_length=100, blank=True, null=True)
+    start_time = models.DateTimeField(blank=True, null=True)
+    end_time = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         managed = False
