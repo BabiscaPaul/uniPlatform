@@ -27,6 +27,9 @@ class Activityassignments(models.Model):
     course = models.ForeignKey('Courses', models.DO_NOTHING, blank=True, null=True)
     laboratory = models.ForeignKey('Laboratories', models.DO_NOTHING, blank=True, null=True)
     seminar = models.ForeignKey('Seminars', models.DO_NOTHING, blank=True, null=True)
+    course_weight = models.IntegerField(blank=True, null=True)
+    laboratory_weight = models.IntegerField(blank=True, null=True)
+    seminar_weight = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False
@@ -66,7 +69,6 @@ class Courses(models.Model):
     course_id = models.AutoField(primary_key=True)
     course_name = models.CharField(max_length=15, blank=True, null=True)
     course_description = models.CharField(max_length=100, blank=True, null=True)
-    course_max_students = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False
@@ -86,11 +88,10 @@ class Enrollments(models.Model):
 class Grades(models.Model):
     grade_id = models.AutoField(primary_key=True)
     student = models.ForeignKey('Students', models.DO_NOTHING, blank=True, null=True)
-    activity = models.ForeignKey(Activities, models.DO_NOTHING, blank=True, null=True)
-    grade_course = models.IntegerField(blank=True, null=True)
-    grade_laboratory = models.IntegerField(blank=True, null=True)
-    grade_seminar = models.IntegerField(blank=True, null=True)
-    grade_final = models.IntegerField(blank=True, null=True)
+    grade_value = models.IntegerField(blank=True, null=True)
+    course = models.ForeignKey(Courses, models.DO_NOTHING, blank=True, null=True)
+    laboratory = models.ForeignKey('Laboratories', models.DO_NOTHING, blank=True, null=True)
+    seminar = models.ForeignKey('Seminars', models.DO_NOTHING, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -138,7 +139,6 @@ class Laboratories(models.Model):
     laboratory_id = models.AutoField(primary_key=True)
     laboratory_name = models.CharField(max_length=15, blank=True, null=True)
     laboratory_description = models.CharField(max_length=100, blank=True, null=True)
-    laboratory_max_students = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False
@@ -149,7 +149,6 @@ class Seminars(models.Model):
     seminar_id = models.AutoField(primary_key=True)
     seminar_name = models.CharField(max_length=15, blank=True, null=True)
     seminar_description = models.CharField(max_length=100, blank=True, null=True)
-    seminar_max_students = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False

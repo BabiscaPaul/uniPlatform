@@ -16,6 +16,11 @@
         body {
             font-family: 'Montserrat', sans-serif;
         }
+
+        .card {
+            max-width: 500px;
+            margin:0 auto;
+        }
     </style>
 </head>
 <body>
@@ -65,66 +70,62 @@
 	</nav>
 </div>
 <div class="container mt-5">
-    <form method="POST" class="text-center">
+    <form method="POST" class="row justify-content-center">
         {% csrf_token %}
-        <h2 class="mb-3">Courses</h2>
-        <div class="row justify-content-center">
-            {% for course in available_courses %}
-                <div class="col-md-4">
-                    <div class="card mb-4 shadow-sm">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ course.course_name }}</h5>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="course" value="{{ course.course_id }}" id="course{{ course.course_id }}">
-                                <label class="form-check-label" for="course{{ course.course_id }}">
-                                    Select this course
-                                </label>
-                            </div>
+        {% for course in available_courses %}
+            <div class="col-12 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ course.course_name }}</h5>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="course" value="{{ course.course_id }}" id="course{{ course.course_id }}" onclick="showHideTextbox('course{{ course.course_id }}')">
+                            <label class="form-check-label" for="course{{ course.course_id }}">
+                                Select this course
+                            </label>
+                            <input type="text" id="course{{ course.course_id }}_weight" name="course_weight" style="display:none">
                         </div>
                     </div>
                 </div>
-            {% endfor %}
-        </div>
+            </div>
+        {% endfor %}
 
-        <h2 class="mb-3">Laboratories</h2>
-        <div class="row justify-content-center">
-            {% for laboratory in available_laboratories %}
-                <div class="col-md-4">
-                    <div class="card mb-4 shadow-sm">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ laboratory.laboratory_name }}</h5>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="laboratory" value="{{ laboratory.laboratory_id }}" id="laboratory{{ laboratory.laboratory_id }}">
-                                <label class="form-check-label" for="laboratory{{ laboratory.laboratory_id }}">
-                                    Select this laboratory
-                                </label>
-                            </div>
+        {% for seminar in available_seminars %}
+            <div class="col-12 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ seminar.seminar_name }}</h5>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="seminar" value="{{ seminar.seminar_id }}" id="seminar{{ seminar.seminar_id }}" onclick="showHideTextbox('seminar{{ seminar.seminar_id }}')">
+                            <label class="form-check-label" for="seminar{{ seminar.seminar_id }}">
+                                Select this seminar
+                            </label>
+                            <input type="text" id="seminar{{ seminar.seminar_id }}_weight" name="seminar_weight" style="display:none">
                         </div>
                     </div>
                 </div>
-            {% endfor %}
-        </div>
+            </div>
+        {% endfor %}
 
-        <h2 class="mb-3">Seminars</h2>
-        <div class="row justify-content-center">
-            {% for seminar in available_seminars %}
-                <div class="col-md-4">
-                    <div class="card mb-4 shadow-sm">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ seminar.seminar_name }}</h5>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="seminar" value="{{ seminar.seminar_id }}" id="seminar{{ seminar.seminar_id }}">
-                                <label class="form-check-label" for="seminar{{ seminar.seminar_id }}">
-                                    Select this seminar
-                                </label>
-                            </div>
+        {% for laboratory in available_laboratories %}
+            <div class="col-12 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ laboratory.laboratory_name }}</h5>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="laboratory" value="{{ laboratory.laboratory_id }}" id="laboratory{{ laboratory.laboratory_id }}" onclick="showHideTextbox('laboratory{{ laboratory.laboratory_id }}')">
+                            <label class="form-check-label" for="laboratory{{ laboratory.laboratory_id }}">
+                                Select this laboratory
+                            </label>
+                            <input type="text" id="laboratory{{ laboratory.laboratory_id }}_weight" name="laboratory_weight" style="display:none">
                         </div>
                     </div>
                 </div>
-            {% endfor %}
-        </div>
+            </div>
+        {% endfor %}
 
-        <button type="submit" class="btn btn-outline-success mt-3">Submit</button>
+        <div class="col-12 text-center">
+            <button type="submit" class="btn btn-outline-success mt-3">Submit</button>
+        </div>
     </form>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
@@ -132,5 +133,18 @@
 		crossorigin="anonymous"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="{% static 'js/pop-up-fade.js' %}"></script>
+<script>
+    function showHideTextbox(id) {
+    var checkbox = document.getElementById(id);
+    var textbox = document.getElementById(id + "_weight");
+
+    if (checkbox.checked) {
+        textbox.style.display = "block";
+    } else {
+        textbox.style.display = "none";
+        textbox.value = "";  // clear the textbox value
+    }
+}
+</script>
 </body>
 </html>
