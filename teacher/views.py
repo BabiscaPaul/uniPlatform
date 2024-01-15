@@ -10,6 +10,7 @@ from io import BytesIO
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Paragraph
 from reportlab.lib.styles import getSampleStyleSheet
+from django.core.exceptions import ValidationError
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def teacher(request):
@@ -198,13 +199,40 @@ def teacherAssignActivity(request):
         selected_laboratories = request.POST.getlist('laboratory')
         selected_seminars = request.POST.getlist('seminar')
 
-        # Get the first selected course, laboratory, and seminar
+        course_weight = str(request.POST.get('course_weight', '0'))
+        laboratory_weight = str(request.POST.get('laboratory_weight', '0'))
+        seminar_weight = str(request.POST.get('seminar_weight', '0'))
+
+        if selected_courses and (not course_weight.isdigit() or int(course_weight) < 0):
+            return redirect('teacher:teacher-assign-activity')
+        if selected_laboratories and (not laboratory_weight.isdigit() or int(laboratory_weight) < 0):
+            return redirect('teacher:teacher-assign-activity')
+        if selected_seminars and (not seminar_weight.isdigit() or int(seminar_weight) < 0):
+            return redirect('teacher:teacher-assign-activity')
+
+        total_activities = len(selected_courses) + len(selected_laboratories) + len(selected_seminars)
+
+        if not teacher.teacher_min_hours <= total_activities <= teacher.teacher_max_hours:
+            return redirect('teacher:teacher-assign-activity')
+
         course_id = selected_courses[0] if selected_courses else None
         laboratory_id = selected_laboratories[0] if selected_laboratories else None
         seminar_id = selected_seminars[0] if selected_seminars else None
 
+        course_weight = int(course_weight) if course_weight.isdigit() else None
+        laboratory_weight = int(laboratory_weight) if laboratory_weight.isdigit() else None
+        seminar_weight = int(seminar_weight) if seminar_weight.isdigit() else None
+
         # Create a single Activityassignments row with the selected IDs
-        Activityassignments.objects.create(teacher=teacher, course_id=course_id, laboratory_id=laboratory_id, seminar_id=seminar_id)
+        Activityassignments.objects.create(
+            teacher=teacher, 
+            course_id=course_id, 
+            laboratory_id=laboratory_id, 
+            seminar_id=seminar_id,
+            course_weight=course_weight,
+            laboratory_weight=laboratory_weight,
+            seminar_weight=seminar_weight
+        )
 
         # Redirect to profile page after assigning activities
         return redirect('teacher:teacher-profile')
