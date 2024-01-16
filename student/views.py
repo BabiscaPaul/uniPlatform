@@ -4,7 +4,8 @@ from sharedmodels.models import Authentications, Users
 from django.views.decorators.cache import cache_control
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from sharedmodels.models import Authentications, Studentenrollments, Users, Teachers, Activities, Students, Courses, \
+from sharedmodels.models import Authentications, Groupmessages, Studentenrollments, Users, Teachers, Activities, \
+    Students, Courses, \
     Seminars, Laboratories, \
     Activityassignments
 
@@ -108,3 +109,24 @@ def activities(request):
     }
 
     return render(request, 'student/student-activities.html', context)
+
+
+def messages(request):
+    user_id = request.session['user_id']
+    student = Students.objects.get(student__user_id=user_id)
+    user = Users.objects.get(user_id=user_id)
+
+    if request.method == 'POST':
+        messageContent = request.POST['content']
+        message = Groupmessages(message_context=messageContent, student=student)
+        message.save()
+
+    # Fetch all messages
+    all_messages = Groupmessages.objects.all().order_by('message_time')
+
+    context = {
+        'all_messages': all_messages,
+        'user': user
+    }
+
+    return render(request, 'student/student-messages.html', context)
