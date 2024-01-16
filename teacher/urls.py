@@ -14,4 +14,9 @@ urlpatterns = [
     path('teacher-assign-activity/', views.teacherAssignActivity, name='teacher-assign-activity'),
     path('teacher-profile-specific/<int:teacher_id>/', views.teacherProfileSpecific, name='teacher-profile-specific'),
     path('teacher-change-credentials/<int:teacher_id>/', views.teacherChangeCredentials, name='change-credentials'),
+    path('teacher-view-students', views.teacherStudentsList, name='teacher-view-students'),
+    path('teacher-view-students/<int:studyYear>/', views.teacherStudentsList, name='teacher-view-students-year'),
+    path('teacher-grade-specific/<int:student_id>/', views.teacherGradeSpecific, name='teacher-grade-specific'),
+    path('teacher-add-grade/<int:student_id>/', views.teacherAddGrade, name='teacher-add-grade'),
+    path('teacher-download-grades/', views.teacherDownloadGrades, name='teacher-download-grades'),
 ]

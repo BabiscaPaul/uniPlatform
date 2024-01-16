@@ -1,16 +1,17 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseForbidden, FileResponse, HttpResponse
-from sharedmodels.models import Authentications, Users, Teachers, Activities, Students, Courses, Seminars, Laboratories, Activityassignments
+from sharedmodels.models import Authentications, Users, Teachers, Activities, Students, Courses, Seminars, Laboratories, Activityassignments, Studentenrollments, Grades
 from django.views.decorators.cache import cache_control
 from django.http import JsonResponse
 from django.template.loader import render_to_string
-from .forms import ActivityForm, TeacherForm
+from .forms import ActivityForm, TeacherForm, GradeForm
 from reportlab.pdfgen import canvas
 from io import BytesIO
-from reportlab.lib.pagesizes import letter
+from reportlab.lib.pagesizes import letter, landscape
 from reportlab.platypus import SimpleDocTemplate, Paragraph
 from reportlab.lib.styles import getSampleStyleSheet
 from django.core.exceptions import ValidationError
+from collections import defaultdict
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def teacher(request):
@@ -177,9 +178,9 @@ def teacherDownloadActivities(request):
 
     return response
 
-#TODO
+
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def teacherStudentsList(request):
+def teacherStudentsList(request, studyYear = 0):
     if 'user_id' not in request.session:
         # User is not logged in
         return redirect('accounts:signin')
@@ -193,7 +194,12 @@ def teacherStudentsList(request):
         # User is not a teacher
         return HttpResponseForbidden("You are not authorized to view this page.")
     # User is logged in and is a teacher
-    students = Students.objects.all()
+    if studyYear:
+        # Fetch only the students of the specified study year
+        students = Students.objects.filter(student_study_year=studyYear).order_by('student_study_year')
+    else:
+        # Fetch all students
+        students = Students.objects.all().order_by('student_study_year')
     return render(request, 'teacher/teacher-list.html', {'students': students})
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -285,3 +291,115 @@ def teacherChangeCredentials(request, teacher_id):
     else:
         form = TeacherForm(instance=user, teacher=teacher)
     return render(request, 'teacher/teacher-change-credentials.html', {'form': form})
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def teacherGradeSpecific(request, student_id):
+    if 'user_id' not in request.session:
+        return redirect('accounts:signin')
+    user_id = request.session['user_id']
+    try:
+        user = Authentications.objects.get(user__user_id=user_id).user
+    except Authentications.DoesNotExist:
+        # User does not exist
+        return HttpResponseForbidden("You are not authorized to view this page.")
+    if user.user_type != 'teacher':
+        # User is not a teacher
+        return HttpResponseForbidden("You are not authorized to view this page.")
+    # User is logged in and is a teacher
+    teacher = Teachers.objects.get(teacher_id=user_id)
+    # User is logged in and is a teacher
+    try:
+        enrollment = Studentenrollments.objects.get(teacher=teacher, student__student__user_id=student_id)
+    except Studentenrollments.DoesNotExist:
+        # No enrollment exists for this teacher and student
+        return HttpResponseForbidden("You are not authorized to view this page.")
+    
+    student = Students.objects.get(student_id=student_id)
+    grades = Grades.objects.filter(student__student__user_id=student_id)
+    return render(request, 'teacher/teacher-grades-specific.html', {'grades': grades, 'student': student})
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def teacherAddGrade(request, student_id):
+    if 'user_id' not in request.session:
+        return redirect('accounts:signin')
+    user_id = request.session['user_id']
+    try:
+        user = Authentications.objects.get(user__user_id=user_id).user
+    except Authentications.DoesNotExist:
+        # User does not exist
+        return HttpResponseForbidden("You are not authorized to view this page.")
+    if user.user_type != 'teacher':
+        # User is not a teacher
+        return HttpResponseForbidden("You are not authorized to view this page.")
+    
+    student = get_object_or_404(Students, pk=student_id)
+
+    # Get the teacher's assigned activities
+    assigned_activities = Activityassignments.objects.filter(teacher__teacher_id=user_id)
+
+    assigned_courses = [activity.course for activity in assigned_activities if activity.course is not None]
+    assigned_laboratories = [activity.laboratory for activity in assigned_activities if activity.laboratory is not None]
+    assigned_seminars = [activity.seminar for activity in assigned_activities if activity.seminar is not None]
+
+    # Assuming you have a Student model and you can get the current student from the session
+    student = Students.objects.get(student_id=student_id)
+
+    if request.method == 'POST':
+        form = GradeForm(request.POST, assigned_courses=assigned_courses, assigned_laboratories=assigned_laboratories, assigned_seminars=assigned_seminars)
+        if form.is_valid():
+            grade_value = form.cleaned_data['grade_value']
+            course = form.cleaned_data['course']
+            laboratory = form.cleaned_data['laboratory']
+            seminar = form.cleaned_data['seminar']
+
+            # Create a new Grades object with the form data and save it to the database
+            grade = Grades(grade_value=grade_value, course=course, laboratory=laboratory, seminar=seminar, student=student)
+            grade.save()
+
+            return redirect('teacher:teacher-grade-specific', student_id=student.student_id)
+    else:
+        form = GradeForm(assigned_courses=assigned_courses, assigned_laboratories=assigned_laboratories, assigned_seminars=assigned_seminars)
+
+    return render(request, 'teacher/teacher-add-grade.html', {'form': form, 'student': student})
+
+def teacherDownloadGrades(request):
+    # Create a new PDF file with ReportLab
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="grades.pdf"'
+    
+    buffer = BytesIO()
+    p = canvas.Canvas(buffer, pagesize=landscape(letter))
+
+    students = Students.objects.all()
+    y = 550
+    for student in students:
+        grades = Grades.objects.filter(student=student)
+        p.drawString(50, y, f'Student: {student.student.user_first_name} - {student.student.user_last_name}')
+        y -= 25
+
+        # Group grades by course, laboratory, and seminar
+        grouped_grades = defaultdict(list)
+        for grade in grades:
+            if grade.course:
+                grouped_grades[grade.course.course_name].append(grade.grade_value)
+            if grade.laboratory:
+                grouped_grades[grade.laboratory.laboratory_name].append(grade.grade_value)
+            if grade.seminar:
+                grouped_grades[grade.seminar.seminar_name].append(grade.grade_value)
+
+        # Display the grades for each group
+        for group, grades in grouped_grades.items():
+            grades_str = ', '.join(str(grade) for grade in grades)
+            p.drawString(100, y, f'{group}: {grades_str}')
+            y -= 25
+
+        y -= 25
+
+    p.showPage()
+    p.save()
+
+    pdf = buffer.getvalue()
+    buffer.close()
+    response.write(pdf)
+
+    return response
