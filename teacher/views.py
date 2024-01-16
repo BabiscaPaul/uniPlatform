@@ -106,6 +106,7 @@ def teacherCreateActivity(request):
         if form.is_valid():
             activity = form.save(commit=False)
             activity.activity_created_by = user
+            activity.activity_number_of_students = 0
             activity.save()
             return redirect('teacher:teacher-activities')
     else:
