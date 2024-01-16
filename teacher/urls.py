@@ -12,4 +12,6 @@ urlpatterns = [
     path('teacher-download-activities/', views.teacherDownloadActivities, name='teacher-download-activities'),
     path('teacher-students-list/', views.teacherStudentsList, name='teacher-students-list'),
     path('teacher-assign-activity/', views.teacherAssignActivity, name='teacher-assign-activity'),
+    path('teacher-profile-specific/<int:teacher_id>/', views.teacherProfileSpecific, name='teacher-profile-specific'),
+    path('teacher-change-credentials/<int:teacher_id>/', views.teacherChangeCredentials, name='change-credentials'),
 ]

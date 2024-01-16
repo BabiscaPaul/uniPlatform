@@ -1,10 +1,10 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseForbidden, FileResponse, HttpResponse
 from sharedmodels.models import Authentications, Users, Teachers, Activities, Students, Courses, Seminars, Laboratories, Activityassignments
 from django.views.decorators.cache import cache_control
 from django.http import JsonResponse
 from django.template.loader import render_to_string
-from .forms import ActivityForm
+from .forms import ActivityForm, TeacherForm
 from reportlab.pdfgen import canvas
 from io import BytesIO
 from reportlab.lib.pagesizes import letter
@@ -67,6 +67,36 @@ def teacherProfile(request):
     }
 
     return render(request, 'teacher/teacher-profile.html', context) 
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def teacherProfileSpecific(request, teacher_id):
+    if 'user_id' not in request.session:
+        # User is not logged in
+        return redirect('accounts:signin')
+
+    try:
+        teacher = Teachers.objects.get(teacher__user_id=teacher_id)  # Fetch the teacher data
+    except Teachers.DoesNotExist:
+        # Teacher does not exist
+        return HttpResponseForbidden("You are not authorized to view this page.")
+
+    assignments = Activityassignments.objects.filter(teacher=teacher)
+
+    # Create a list of activity names
+    activity_names = []
+    for assignment in assignments:
+        if assignment.course:
+            activity_names.append(str(assignment.course.course_name))
+        if assignment.laboratory:
+            activity_names.append(str(assignment.laboratory.laboratory_name))
+        if assignment.seminar:
+            activity_names.append(str(assignment.seminar.seminar_name))
+
+    # Join the activity names into a string
+    activities = ', '.join(activity_names)
+
+    context = {'teacher': teacher, 'activities': activities}
+    return render(request, 'teacher/teacher-profile.html', context)
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def teacherActivities(request):
@@ -243,3 +273,15 @@ def teacherAssignActivity(request):
         'available_laboratories': available_laboratories,
         'available_seminars': available_seminars,
     })
+
+def teacherChangeCredentials(request, teacher_id):
+    teacher = get_object_or_404(Teachers, pk=teacher_id)
+    user = teacher.teacher
+    if request.method == 'POST':
+        form = TeacherForm(request.POST, instance=user, teacher=teacher)
+        if form.is_valid():
+            form.save()
+            return redirect('teacher:teacher-profile-specific', teacher_id=teacher_id)
+    else:
+        form = TeacherForm(instance=user, teacher=teacher)
+    return render(request, 'teacher/teacher-change-credentials.html', {'form': form})

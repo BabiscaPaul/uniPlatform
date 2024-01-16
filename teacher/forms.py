@@ -1,6 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from sharedmodels.models import Activities
+from sharedmodels.models import Activities, Teachers, Users
 
 class ActivityForm(forms.ModelForm):
     class Meta:
@@ -18,3 +18,19 @@ class ActivityForm(forms.ModelForm):
                 raise ValidationError("End date should be after start date.")
 
         return cleaned_data
+    
+class TeacherForm(forms.ModelForm):
+    
+    class Meta:
+        model = Users
+        fields = ['user_first_name', 'user_last_name', 'user_pic', 'user_address', 'user_email', 'user_phone_number', 'user_contract_number', 'user_iban']
+
+    def __init__(self, *args, **kwargs):
+        self.teacher = kwargs.pop('teacher', None)
+        super().__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        if commit:
+            user.save()
+        return user
