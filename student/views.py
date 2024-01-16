@@ -74,11 +74,13 @@ def enroll(request):
         teacher_id = request.POST['teacher_id']  # Retrieve teacher_id from POST data
         user_id = request.session['user_id']  # Retrieve user_id from session data
 
-        studentEnroll = Studentenrollments(teacher_id=teacher_id, student_id=user_id)
-        studentEnroll.save()
+        # Check if an enrollment already exists for the student-teacher pair
+        existing_enrollment = Studentenrollments.objects.filter(teacher_id=teacher_id, student_id=user_id)
 
-        # Now you can use teacher_id and user_id as needed
-        # ...
+        if not existing_enrollment.exists():
+            # If an enrollment does not exist, create a new one
+            studentEnroll = Studentenrollments(teacher_id=teacher_id, student_id=user_id)
+            studentEnroll.save()
 
     return redirect('student:student-courses')
 
@@ -89,17 +91,20 @@ def activities(request):
     user_id = request.session['user_id']
     # Fetch the enrollments for the student
     enrollments = Studentenrollments.objects.filter(student__student__user_id=user_id)
-    # Fetch the courses for the enrollments
-    departments = [enrollment.teacher.teacher_department for enrollment in enrollments]
 
-    courses = Courses.objects.filter(course_name__in=departments)
-    labs = Laboratories.objects.filter(laboratory_name__in=departments)
-    seminars = Seminars.objects.filter(seminar_name__in=departments)
+    activitiesToDisplay = []
+
+    activities = Activities.objects.all()
+
+    # For each enrollment, get the corresponding activity
+    for enrollment in enrollments:
+        for activity in activities:
+            # Check if the teacher who created the activity is the same as the teacher in the student's enrollment
+            if activity.activity_created_by_id == enrollment.teacher_id:
+                activitiesToDisplay.append(activity)
 
     context = {
-        'courses': courses,
-        'labs': labs,
-        'seminars': seminars,
+        'activities': activitiesToDisplay
     }
 
     return render(request, 'student/student-activities.html', context)
