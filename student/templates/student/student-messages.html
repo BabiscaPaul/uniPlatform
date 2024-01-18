@@ -10,7 +10,7 @@
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
 		  integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-	<title>Student Profile</title>
+	<title>Student</title>
 	<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
 	<style>
         body {
@@ -70,40 +70,36 @@
 		</div>
 	</nav>
 </div>
-<div class="container mt-5">
-	<div class="row justify-content-center">
-		<div class="col-md-10">
-			<div class="card border-light mb-3 shadow-lg p-3 mb-5 bg-white rounded">
-				<div class="card-header bg-transparent border-success">
-					<h2 class="card-title text-center" style="font-size:3rem">Student's Details:</h2>
-				</div>
-				<div class="card-body text-success">
-					<p class="card-text" style="font-size:1.2rem"><strong>First Name:</strong> {{ student.student.user_first_name }}
-					</p>
-					<p class="card-text" style="font-size:1.2rem"><strong>Last
-																		  Name:</strong> {{ student.student.user_last_name }}
-					</p>
-					<p class="card-text" style="font-size:1.2rem">
-						<strong>Email:</strong> {{ student.student.user_email }}</p>
-					<p class="card-text" style="font-size:1.2rem">
-						<strong>Phone:</strong> {{ student.student.user_phone_number }}</p>
-					<p class="card-text" style="font-size:1.2rem">
-						<strong>Address:</strong> {{ student.student.user_address }}</p>
-					<p class="card-text" style="font-size:1.2rem"><strong>PIC:</strong> {{ student.student.user_pic }}
-					</p>
-					<p class="card-text" style="font-size:1.2rem"><strong>IBAN:</strong> {{ student.student.user_iban }}
-					</p>
-					<p class="card-text" style="font-size:1.2rem"><strong>Contract
-																		  Number:</strong> {{ student.student.user_contract_number }}
-					</p>
-					<p class="card-text" style="font-size:1.2rem"><strong>Study
-																			Year:</strong> {{ student.student_study_year }}
-					</p>
-				</div>
+
+<div class="container mt-3">
+	<h1 class="text-center">{{ group_name }}</h1>
+	<p class="text-center">{{ group_desc }}</p>
+</div>
+
+<div class="container mt-3">
+	{% for message in messages %}
+		<div class="card mb-3">
+			<div class="card-body">
+				<p class="card-text">
+					<strong>{{ message.student.student.user_first_name }}</strong>: {{ message.message_context }}</p>
+				<p class="card-subtitle text-muted">{{ message.message_time }}</p>
 			</div>
 		</div>
-	</div>
+	{% endfor %}
 </div>
+
+<form action="{% url 'student:student-group-messages' group_id %}" method="post" class="w-50">
+	{% csrf_token %}
+	<div id="messages" style="margin-bottom: 80px;">
+		<div class="fixed-bottom d-flex justify-content-center align-items-center bg-light" style="padding: 10px;">
+			<div class="input-group">
+				<input type="text" id="messageInput" name="content" class="form-control" placeholder="Type a message"
+					   required>
+				<button type="submit" class="btn btn-outline-success">Send</button>
+			</div>
+		</div>
+</form>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
 		integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
 		crossorigin="anonymous"></script>

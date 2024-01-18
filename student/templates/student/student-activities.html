@@ -43,13 +43,13 @@
 					<a class="nav-link active" aria-current="page" href="#">Home</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" href="#">Your Groups</a>
+					<a class="nav-link" href="{% url 'student:student-messages-1' %}">Messages</a>
 				</li>
 				<li class="nav-item">
 					<a class="nav-link" href="{% url 'student:student-activities' %}">Your Activities</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" href="#">Your Grades</a>
+					<a class="nav-link" href="{% url 'student:student-grades' %}">Your Grades</a>
 				</li>
 				<li class="nav-item">
 					<a class="nav-link" href="{% url 'student:student-courses' %}">Your Courses</a>
@@ -72,30 +72,13 @@
 <div class="container">
 	<h1 class="my-4">Your Activities</h1>
 	<ul class="list-group">
-		<p>Courses to attend</p>
-		{% for course in courses %}
-			<li class="list-group-item d-flex justify-content-between align-items-center">
-				{{ course.course_name }} - {{ course.course_description }}
-				<span><strong>Start</strong>: {{ course.start_time|date:"d M H:i" }} <strong>End</strong>: {{ course.end_time|date:"d M H:i" }}</span>
-			</li>
-		{% endfor %}
-	</ul>
-	<ul class="list-group">
-		<p>Laboratories to attend</p>
-		{% for lab in labs %}
-			<li class="list-group-item d-flex justify-content-between align-items-center">
-				{{ lab.laboratory_name }} - {{ lab.laboratory_description }}
-				<span><strong>Start</strong>: {{ lab.start_time|date:"d M H:i" }} <strong>End</strong>: {{ lab.end_time|date:"d M H:i" }}</span>
-			</li>
-		{% endfor %}
-	</ul>
-	<ul class="list-group">
-		<p>Seminars to attend</p>
-		{% for seminar in seminars %}
-			<li class="list-group-item d-flex justify-content-between align-items-center">
-				{{ seminar.seminar_name }} - {{ seminar.seminar_description }}
-				<span><strong>Start</strong>: {{ seminar.start_time|date:"d M H:i" }} <strong>End</strong>: {{ seminar.end_time|date:"d M H:i" }}</span>
-			</li>
+		{% for activity in activities %}
+		<li class="list-group-item d-flex justify-content-between align-items-center">
+			{{ activity.activity_type }}
+			<span><strong>Start</strong>: {{ activity.activity_start_date|date:"d M H:i" }} <strong>End</strong>: {{ activity.activity_end_date|date:"d M H:i" }}</span>
+		</li>
+		{% empty %}
+		<li class="list-group-item">No activities found.</li>
 		{% endfor %}
 	</ul>
 </div>
