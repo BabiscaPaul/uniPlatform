@@ -44,13 +44,13 @@
 						<a class="nav-link active" aria-current="page" href="#">Home</a>
 					</li>
 					<li class="nav-item">
-						<a class="nav-link" href="{% url 'student:student-messages' %}">Messages</a>
+						<a class="nav-link" href="{% url 'student:student-messages-1' %}">Messages</a>
 					</li>
 					<li class="nav-item">
 						<a class="nav-link" href="{% url 'student:student-activities' %}">Your Activities</a>
 					</li>
 					<li class="nav-item">
-						<a class="nav-link" href="#">Your Grades</a>
+						<a class="nav-link" href="{% url 'student:student-grades' %}">Your Grades</a>
 					</li>
 					<li class="nav-item">
 						<a class="nav-link" href="{% url 'student:student-courses' %}">Your Courses</a>
@@ -71,16 +71,23 @@
 	</nav>
 </div>
 
-{% for message in all_messages %}
-	<div class="card mb-3">
-		<div class="card-body">
-			<p class="card-text"><strong>{{ user.user_first_name }}</strong> {{ message.message_context }}
-			</p>
-		</div>
-	</div>
-{% endfor %}
+<div class="container mt-3">
+	<h1 class="text-center">{{ group_name }}</h1>
+	<p class="text-center">{{ group_desc }}</p>
+</div>
 
-<form action="{% url 'student:student-messages' %}" method="post" class="w-50">
+<div class="container mt-3">
+	{% for message in messages %}
+		<div class="card mb-3">
+			<div class="card-body">
+				<p class="card-text">{{ message.message_context }}</p>
+				<p class="card-subtitle text-muted">{{ message.message_time }}</p>
+			</div>
+		</div>
+	{% endfor %}
+</div>
+
+<form action="{% url 'student:student-group-messages' %}" method="post" class="w-50">
 	{% csrf_token %}
 	<div id="messages" style="margin-bottom: 80px;">
 		<div class="fixed-bottom d-flex justify-content-center align-items-center bg-light" style="padding: 10px;">
