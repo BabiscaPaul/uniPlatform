@@ -12,6 +12,8 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph
 from reportlab.lib.styles import getSampleStyleSheet
 from django.core.exceptions import ValidationError
 from collections import defaultdict
+from reportlab.platypus import Spacer
+from reportlab.lib import colors
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def teacher(request):
@@ -114,7 +116,10 @@ def teacherActivities(request):
         # User is not a teacher
         return HttpResponseForbidden("You are not authorized to view this page.")
     # User is logged in and is a teacher
-    activities = Activities.objects.all().order_by('activity_start_date')
+
+    # Fetch only the activities created by the current teacher
+    activities = Activities.objects.filter(activity_created_by__user_id=user_id).order_by('activity_start_date')
+
     return render(request, 'teacher/teacher-activities.html', {'activities': activities})
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -144,37 +149,40 @@ def teacherCreateActivity(request):
         form = ActivityForm()
     return render(request, 'teacher/teacher-create-activity.html', {'form': form})
 
-from reportlab.platypus import Spacer
-
 def teacherDownloadActivities(request):
-    # Create a file-like buffer to receive PDF data.
-    buffer = BytesIO()
-
-    # Create the PDF object, using the buffer as its "file."
-    doc = SimpleDocTemplate(buffer, pagesize=letter)
-    story = []
-    styles = getSampleStyleSheet()
-
-    # Get all activities
-    activities = Activities.objects.all().order_by('activity_start_date')
-
-    # Draw the activities on the PDF.
-    for activity in activities:
-        text = f"Activity: {activity.activity_type}, Start Date: {activity.activity_start_date}, End Date: {activity.activity_end_date}"
-        story.append(Paragraph(text, styles['Normal']))
-        text = f"Created By: {activity.activity_created_by.user_first_name} {activity.activity_created_by.user_last_name}"
-        story.append(Paragraph(text, styles['Normal']))
-        story.append(Spacer(1, 12))  # Add a blank line after each activity
-
-    # Build the PDF
-    doc.build(story)
-
-    # Reset the buffer's position to the start of the data.
-    buffer.seek(0)
-
-    # Create a response with the PDF data, the appropriate content type, and headers.
-    response = FileResponse(buffer, content_type='application/pdf')
+    # Create a new PDF file with ReportLab
+    response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="activities.pdf"'
+    
+    buffer = BytesIO()
+    p = canvas.Canvas(buffer, pagesize=landscape(letter))
+
+    # Fetch only the activities created by the current teacher
+    user_id = request.session['user_id']
+    activities = Activities.objects.filter(activity_created_by__user_id=user_id)
+
+    y = 550
+    for activity in activities:
+        p.setFont("Helvetica-Bold", 14)
+        p.drawString(50, y, f'Activity: {activity.activity_type}')
+        y -= 30
+
+        p.setFont("Helvetica", 12)
+        p.drawString(100, y, f'Start Date: {activity.activity_start_date}')
+        y -= 20
+        p.drawString(100, y, f'End Date: {activity.activity_end_date}')
+        y -= 30
+
+        p.setStrokeColor(colors.black)
+        p.line(50, y, 550, y)
+        y -= 30
+
+    p.showPage()
+    p.save()
+
+    pdf = buffer.getvalue()
+    buffer.close()
+    response.write(pdf)
 
     return response
 
@@ -194,12 +202,17 @@ def teacherStudentsList(request, studyYear = 0):
         # User is not a teacher
         return HttpResponseForbidden("You are not authorized to view this page.")
     # User is logged in and is a teacher
+
+    # Fetch only the students who have the current teacher as their teacher
+    enrollments = Studentenrollments.objects.filter(teacher__teacher__user_id=user_id)
+    students = Students.objects.filter(studentenrollments__in=enrollments)
+
     if studyYear:
-        # Fetch only the students of the specified study year
-        students = Students.objects.filter(student_study_year=studyYear).order_by('student_study_year')
-    else:
-        # Fetch all students
-        students = Students.objects.all().order_by('student_study_year')
+        # Filter the students by the specified study year
+        students = students.filter(student_study_year=studyYear)
+
+    students = students.order_by('student_study_year')
+
     return render(request, 'teacher/teacher-list.html', {'students': students})
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -316,6 +329,8 @@ def teacherGradeSpecific(request, student_id):
     
     student = Students.objects.get(student_id=student_id)
     grades = Grades.objects.filter(student__student__user_id=student_id)
+
+
     return render(request, 'teacher/teacher-grades-specific.html', {'grades': grades, 'student': student})
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -341,9 +356,6 @@ def teacherAddGrade(request, student_id):
     assigned_laboratories = [activity.laboratory for activity in assigned_activities if activity.laboratory is not None]
     assigned_seminars = [activity.seminar for activity in assigned_activities if activity.seminar is not None]
 
-    # Assuming you have a Student model and you can get the current student from the session
-    student = Students.objects.get(student_id=student_id)
-
     if request.method == 'POST':
         form = GradeForm(request.POST, assigned_courses=assigned_courses, assigned_laboratories=assigned_laboratories, assigned_seminars=assigned_seminars)
         if form.is_valid():
@@ -352,11 +364,19 @@ def teacherAddGrade(request, student_id):
             laboratory = form.cleaned_data['laboratory']
             seminar = form.cleaned_data['seminar']
 
-            # Create a new Grades object with the form data and save it to the database
-            grade = Grades(grade_value=grade_value, course=course, laboratory=laboratory, seminar=seminar, student=student)
-            grade.save()
+            # Check if a grade already exists for the student for the given course, seminar, or laboratory
+            existing_grade = Grades.objects.filter(student=student, course=course, laboratory=laboratory, seminar=seminar).first()
+            if existing_grade:
+                # If a grade already exists, update it
+                existing_grade.grade_value = grade_value
+                existing_grade.save()
+            else:
+                # Otherwise, create a new Grades object with the form data and save it to the database
+                grade = Grades(grade_value=grade_value, course=course, laboratory=laboratory, seminar=seminar, student=student)
+                grade.save()
 
             return redirect('teacher:teacher-grade-specific', student_id=student.student_id)
+
     else:
         form = GradeForm(assigned_courses=assigned_courses, assigned_laboratories=assigned_laboratories, assigned_seminars=assigned_seminars)
 
@@ -370,7 +390,11 @@ def teacherDownloadGrades(request):
     buffer = BytesIO()
     p = canvas.Canvas(buffer, pagesize=landscape(letter))
 
-    students = Students.objects.all()
+    # Fetch only the students who have the current teacher as their teacher
+    user_id = request.session['user_id']
+    enrollments = Studentenrollments.objects.filter(teacher__teacher__user_id=user_id)
+    students = Students.objects.filter(studentenrollments__in=enrollments)
+
     y = 550
     for student in students:
         grades = Grades.objects.filter(student=student)
