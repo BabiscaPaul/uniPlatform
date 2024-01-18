@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseForbidden
 from sharedmodels.models import Authentications, Users
 from django.views.decorators.cache import cache_control
@@ -10,6 +10,7 @@ from sharedmodels.models import Authentications, Groupmembers, Studygroups, Grad
     Students, Courses, \
     Seminars, Laboratories, \
     Activityassignments
+from .forms import StudentForm
 from django.utils import timezone
 
 
@@ -53,6 +54,18 @@ def studentProfile(request):
 
     user_id = request.session['user_id']
     student = Students.objects.get(student__user_id=user_id)
+
+    context = {
+        'student': student,
+    }
+
+    return render(request, 'student/student-profile.html', context)
+
+def studentProfileSpecific(request, student_id):
+    isUserStudent(request)
+
+    user_id = request.session['user_id']
+    student = Students.objects.get(student__user_id=student_id)
 
     context = {
         'student': student,
@@ -113,6 +126,17 @@ def activities(request):
 
     return render(request, 'student/student-activities.html', context)
 
+def studentChangeCredentials(request, student_id):
+    student = get_object_or_404(Students, pk=student_id)
+    user = student.student
+    if request.method == 'POST':
+        form = StudentForm(request.POST, instance=user, student=student)
+        if form.is_valid():
+            form.save()
+            return redirect('student:student-profile-specific', student_id=student_id)
+    else:
+        form = StudentForm(instance=user, student=student)
+    return render(request, 'student/student-change-credentials.html', {'form': form})
 
 def messages_1(request):
     return render(request, 'student/student-messages-1.html')
