@@ -80,14 +80,15 @@
 	{% for message in messages %}
 		<div class="card mb-3">
 			<div class="card-body">
-				<p class="card-text">{{ message.message_context }}</p>
+				<p class="card-text">
+					<strong>{{ message.student.student.user_first_name }}</strong>: {{ message.message_context }}</p>
 				<p class="card-subtitle text-muted">{{ message.message_time }}</p>
 			</div>
 		</div>
 	{% endfor %}
 </div>
 
-<form action="{% url 'student:student-group-messages' %}" method="post" class="w-50">
+<form action="{% url 'student:student-group-messages' group_id %}" method="post" class="w-50">
 	{% csrf_token %}
 	<div id="messages" style="margin-bottom: 80px;">
 		<div class="fixed-bottom d-flex justify-content-center align-items-center bg-light" style="padding: 10px;">

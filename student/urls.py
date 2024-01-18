@@ -15,6 +15,6 @@ urlpatterns = [
     path('student-creategroup', views.creategroup, name='student-creategroup'),
     path('student-joingroup-page', views.joinGroupPage, name='student-joingroup-page'),
     path('student-joingroup', views.joinGroup, name='student-joingroup'),
-    path('student-group-message', views.sendMessage, name='student-group-messages'),
+    path('student-group-message/<int:group_id>/', views.sendMessage, name='student-group-messages'),
     path('student-grades', views.grades, name='student-grades'),
 ]

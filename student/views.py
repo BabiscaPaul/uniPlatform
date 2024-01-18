@@ -4,12 +4,14 @@ from sharedmodels.models import Authentications, Users
 from django.views.decorators.cache import cache_control
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from sharedmodels.models import Authentications, Groupmembers, Studygroups, Grades, Groupmessages, Studentenrollments, Users, \
+from sharedmodels.models import Authentications, Groupmembers, Studygroups, Grades, Groupmessages, Studentenrollments, \
+    Users, \
     Teachers, Activities, \
     Students, Courses, \
     Seminars, Laboratories, \
     Activityassignments
 from django.utils import timezone
+
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def student(request):
@@ -133,7 +135,8 @@ def creategroup(request):
 
         new_group = Studygroups(group_name=group_name, group_description=group_description,
                                 group_password=group_password)
-        new_group_member = Groupmembers(group=new_group, student=Students.objects.get(student__user_id=request.session['user_id']))
+        new_group_member = Groupmembers(group=new_group,
+                                        student=Students.objects.get(student__user_id=request.session['user_id']))
         new_group.save()
         new_group_member.save()
 
@@ -155,21 +158,23 @@ def joinGroup(request):
             group_desc = Studygroups.objects.get(group_name=group_name).group_description
 
             # Add the student to the study group
-            potential_new_group_member = Groupmembers(group=studyGroup, student=Students.objects.get(student__user_id=request.session['user_id']))
-            if not (Groupmembers.objects.filter(group=studyGroup, student=Students.objects.get(student__user_id=request.session['user_id']))).exists():
+            potential_new_group_member = Groupmembers(group=studyGroup, student=Students.objects.get(
+                student__user_id=request.session['user_id']))
+            if not (Groupmembers.objects.filter(group=studyGroup, student=Students.objects.get(
+                    student__user_id=request.session['user_id']))).exists():
                 potential_new_group_member.save()
 
             student = Students.objects.get(student__user_id=request.session['user_id'])
-            group_member = Groupmembers.objects.get(student=student)
-            curr_group = group_member.group
+            group_members = Groupmembers.objects.filter(student=student)
+            curr_group = studyGroup
             group_messages = Groupmessages.objects.filter(group=curr_group).order_by('message_time')
 
             context = {
                 'group_name': group_name,
                 'group_desc': group_desc,
                 'messages': group_messages,
+                'group_id': studyGroup.group_id,
             }
-
 
             # If the study group is found, redirect to the messages page
             return render(request, 'student/student-messages.html', context)
@@ -180,17 +185,16 @@ def joinGroup(request):
     return render(request, 'student/student-joingroup.html')
 
 
-def sendMessage(request):
+def sendMessage(request, group_id):
     user_id = request.session['user_id']
+    user = Users.objects.get(user_id=user_id)
     student = Students.objects.get(student__user_id=user_id)
-
-    group_member = Groupmembers.objects.get(student=student)
-
-    curr_group = group_member.group
 
     if request.method == 'POST':
         messageContent = request.POST['content']
-        message = Groupmessages(group=curr_group, message_context=messageContent, student=student, message_time=timezone.now())
+        curr_group = Studygroups.objects.get(group_id=group_id)
+        message = Groupmessages(group=curr_group, message_context=messageContent, student=student,
+                                message_time=timezone.now())
         message.save()
 
     # Fetch all messages that belong to the current group
@@ -198,6 +202,10 @@ def sendMessage(request):
 
     context = {
         'messages': messages,
+        'user': user,
+        'group_id': group_id,
+        'group_name': curr_group.group_name,
+        'group_desc': curr_group.group_description,
     }
 
     return render(request, 'student/student-messages.html', context)
