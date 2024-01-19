@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-@*1q4@_k2ytsz1)=^k5uf#d5^kqapxe8tb=(y-8oasi719qg0b
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
@@ -56,6 +56,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
 
 ROOT_URLCONF = 'uniPlatform.urls'

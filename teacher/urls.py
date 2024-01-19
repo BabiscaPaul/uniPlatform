@@ -19,4 +19,5 @@ urlpatterns = [
     path('teacher-grade-specific/<int:student_id>/', views.teacherGradeSpecific, name='teacher-grade-specific'),
     path('teacher-add-grade/<int:student_id>/', views.teacherAddGrade, name='teacher-add-grade'),
     path('teacher-download-grades/', views.teacherDownloadGrades, name='teacher-download-grades'),
+    path('search-suggestions/', views.search_suggestions, name='search-suggestions'),
 ]

@@ -14,6 +14,8 @@ from django.core.exceptions import ValidationError
 from collections import defaultdict
 from reportlab.platypus import Spacer
 from reportlab.lib import colors
+from django.http import JsonResponse
+from django.db.models import Q
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def teacher(request):
@@ -427,3 +429,12 @@ def teacherDownloadGrades(request):
     response.write(pdf)
 
     return response
+
+def get_suggestions(query):
+    users = Users.objects.filter(Q(user_first_name__icontains=query) | Q(user_last_name__icontains=query))
+    return [f'{user.user_first_name} {user.user_last_name}' for user in users]
+
+def search_suggestions(request):
+    query = request.GET.get('q', '')
+    suggestions = get_suggestions(query)
+    return JsonResponse(suggestions, safe=False)

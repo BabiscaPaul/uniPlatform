@@ -16,6 +16,35 @@
         body {
             font-family: 'Montserrat', sans-serif;
         }
+
+		#results {
+			background-color: #f8f9fa;
+			border: 1px solid #ced4da;
+			border-radius: 0.25rem;
+			padding: 0.5rem;
+			margin-top: 0.5rem;
+			max-height: 200px;
+			overflow-y: auto;
+    	}
+
+    #results p {
+        margin: 0;
+        padding: 0.25rem 0;
+        border-bottom: 1px solid #ced4da;
+    }
+
+    #results p:last-child {
+        border-bottom: none;
+    }
+
+    #results p:hover {
+        background-color: #e9ecef;
+    }
+
+	.flex-column {
+        display: flex;
+        flex-direction: column;
+    }
     </style>
 </head>
 <body>
@@ -57,10 +86,10 @@
 					</li>
 				</ul>
 				<form class="d-flex">
-					<input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+					<input class="form-control me-2 search-bar" id="search-bar" type="search" placeholder="Search" aria-label="Search">
 					<button class="btn btn-outline-success" type="submit">Search</button>
 				</form>
-				<div id="results"></div>
+				<div id="results" class="border p-3 rounded bg-light d-none overflow-auto position-absolute" style="max-height: 200px; width: 100%; top: 40px;"></div>
 			</div>
 		</div>
 	</nav>
@@ -93,5 +122,28 @@
 		crossorigin="anonymous"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="{% static 'js/pop-up-fade.js' %}"></script>
+<script>
+	document.getElementById('search-bar').addEventListener('input', function() {
+    fetch('http://127.0.0.1:8000/search-suggestions/?q=' + this.value)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            var resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '';
+            data.forEach(function(item) {
+                var p = document.createElement('p');
+                p.textContent = item;
+                resultsDiv.appendChild(p);
+            });
+        })
+        .catch(error => {
+            console.log('There was a problem with the fetch operation: ' + error.message);
+        });
+});
+</script>
 </body>
 </html>

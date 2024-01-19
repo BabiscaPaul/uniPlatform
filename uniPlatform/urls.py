@@ -16,6 +16,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+import teacher
+from teacher import views
 
 urlpatterns = [
     path('superadmin/', admin.site.urls),
@@ -23,4 +25,5 @@ urlpatterns = [
     path('student/', include('student.urls')),
     path('teacher/', include('teacher.urls')),
     path('adminDB/', include('adminDB.urls')),
+    path('search-suggestions/', teacher.views.search_suggestions),
 ]
