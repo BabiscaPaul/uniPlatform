@@ -250,3 +250,20 @@ def grades(request):
     }
 
     return render(request, 'student/student-grades.html', context)
+
+
+def viewGroupMembers(request, group_id):
+    # Fetch the group using the provided group_id
+    group = Studygroups.objects.get(group_id=group_id)
+
+    # Fetch all the members of the group
+    group_members = Groupmembers.objects.filter(group=group)
+
+    # Fetch the user's first name for each member in the group
+    group_members_first_names = [member.student.student.user_first_name for member in group_members]
+
+    context = {
+        'group_members_first_names': group_members_first_names,
+    }
+
+    return render(request, 'student/view-group-members.html', context)

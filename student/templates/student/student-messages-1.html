@@ -49,9 +49,6 @@
 			<div class="collapse navbar-collapse" id="navbarSupportedContent">
 				<ul class="navbar-nav me-auto mb-2 mb-lg-0">
 					<li class="nav-item">
-						<a class="nav-link active" aria-current="page" href="#">Home</a>
-					</li>
-					<li class="nav-item">
 						<a class="nav-link" href="{% url 'student:student-messages-1' %}">Messages</a>
 					</li>
 					<li class="nav-item">
@@ -96,7 +93,7 @@
                     <div class="card-body">
                         <h5 class="card-title">{{ group.group.group_name }}</h5>
                         <p class="card-text">{{ group.group.group_description }}</p>
-                        <a href="{% url 'student:student-group-messages' group.group.group_id %}" class="btn btn-outline-success">View Group</a>
+                        <a href="{% url 'student:student-group-messages' group.group.group_id %}" class="btn btn-outline-success">Enter Group</a>
                     </div>
                 </div>
             </div>

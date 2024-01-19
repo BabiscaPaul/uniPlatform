@@ -19,4 +19,5 @@ urlpatterns = [
     path('student-joingroup', views.joinGroup, name='student-joingroup'),
     path('student-group-message/<int:group_id>/', views.sendMessage, name='student-group-messages'),
     path('student-grades', views.grades, name='student-grades'),
+    path('student-messages-view-group-members/<int:group_id>/', views.viewGroupMembers, name="student-messages-view-group-members"),
 ]

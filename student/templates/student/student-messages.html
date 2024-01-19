@@ -41,9 +41,6 @@
 			<div class="collapse navbar-collapse" id="navbarSupportedContent">
 				<ul class="navbar-nav me-auto mb-2 mb-lg-0">
 					<li class="nav-item">
-						<a class="nav-link active" aria-current="page" href="#">Home</a>
-					</li>
-					<li class="nav-item">
 						<a class="nav-link" href="{% url 'student:student-messages-1' %}">Messages</a>
 					</li>
 					<li class="nav-item">
@@ -72,7 +69,11 @@
 </div>
 
 <div class="container mt-3">
-	<h1 class="text-center">{{ group_name }}</h1>
+	<div class="container mt-3 d-flex justify-content-center align-items-center">
+		<h1 style="margin: 10px">{{ group_name }}</h1>
+		<a href="{% url 'student:student-messages-view-group-members' group_id %}" style="margin: 10px"
+		   class="btn btn-outline-success btn-sm">view group members</a>
+	</div>
 	<p class="text-center">{{ group_desc }}</p>
 </div>
 
