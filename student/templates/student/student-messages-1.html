@@ -96,7 +96,7 @@
                     <div class="card-body">
                         <h5 class="card-title">{{ group.group.group_name }}</h5>
                         <p class="card-text">{{ group.group.group_description }}</p>
-                        <a href="#" class="btn btn-outline-success">View Group</a>
+                        <a href="{% url 'student:student-group-messages' group.group.group_id %}" class="btn btn-outline-success">View Group</a>
                     </div>
                 </div>
             </div>

@@ -61,6 +61,7 @@ def studentProfile(request):
 
     return render(request, 'student/student-profile.html', context)
 
+
 def studentProfileSpecific(request, student_id):
     isUserStudent(request)
 
@@ -126,6 +127,7 @@ def activities(request):
 
     return render(request, 'student/student-activities.html', context)
 
+
 def studentChangeCredentials(request, student_id):
     student = get_object_or_404(Students, pk=student_id)
     user = student.student
@@ -137,6 +139,7 @@ def studentChangeCredentials(request, student_id):
     else:
         form = StudentForm(instance=user, student=student)
     return render(request, 'student/student-change-credentials.html', {'form': form})
+
 
 def messages_1(request):
     student = Students.objects.get(student__user_id=request.session['user_id'])
@@ -210,14 +213,15 @@ def joinGroup(request):
 
     return render(request, 'student/student-joingroup.html')
 
+
 def sendMessage(request, group_id):
     user_id = request.session['user_id']
     user = Users.objects.get(user_id=user_id)
     student = Students.objects.get(student__user_id=user_id)
+    curr_group = Studygroups.objects.get(group_id=group_id)  # Moved this line outside the if condition
 
     if request.method == 'POST':
         messageContent = request.POST['content']
-        curr_group = Studygroups.objects.get(group_id=group_id)
         message = Groupmessages(group=curr_group, message_context=messageContent, student=student,
                                 message_time=timezone.now())
         message.save()
