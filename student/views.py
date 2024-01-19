@@ -139,7 +139,9 @@ def studentChangeCredentials(request, student_id):
     return render(request, 'student/student-change-credentials.html', {'form': form})
 
 def messages_1(request):
-    return render(request, 'student/student-messages-1.html')
+    student = Students.objects.get(student__user_id=request.session['user_id'])
+    groups = Groupmembers.objects.filter(student=student)
+    return render(request, 'student/student-messages-1.html', {'groups': groups})
 
 
 def creategroupPage(request):
@@ -164,7 +166,7 @@ def creategroup(request):
         new_group.save()
         new_group_member.save()
 
-    return render(request, 'student/student-creategroup.html')
+    return render(request, 'student/student-creategroup.html', {'new_group': new_group})
 
 
 def joinGroupPage(request):
@@ -207,7 +209,6 @@ def joinGroup(request):
             return render(request, 'student/student-joingroup.html', {'error': 'Invalid group name or password.'})
 
     return render(request, 'student/student-joingroup.html')
-
 
 def sendMessage(request, group_id):
     user_id = request.session['user_id']

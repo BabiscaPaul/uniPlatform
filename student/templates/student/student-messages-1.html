@@ -84,10 +84,25 @@
 	</button>
 
 	<button class="btn btn-outline-success" type="button"
-			onclick="location.href='{% url 'student:student-joingroup-page' %}'">Join Group
+			onclick="location.href='{% url 'student:student-joingroup-page' %}'">Join Existing Group
 	</button>
 </div>
-
+<div class="container">
+    <div class="row justify-content-center">
+		<h3 class="row justify-content-center" style="margin-bottom: 50px;">Your current groups</h3>
+        {% for group in groups %}
+            <div class="col-sm-6 col-md-4 col-lg-3 mb-4">
+                <div class="card mx-auto" style="width: 18rem;">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ group.group.group_name }}</h5>
+                        <p class="card-text">{{ group.group.group_description }}</p>
+                        <a href="#" class="btn btn-outline-success">View Group</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
 		integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
