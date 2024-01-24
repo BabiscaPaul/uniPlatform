@@ -29,7 +29,7 @@ Before you begin, ensure you have met the following requirements:
 
 - **Clone the repository**:
   ```
-  git clone https://github.com/your-username/university-platform.git
+  git clone https://github.com/hnqhnqhnq/university-platform.git
   ```
 
 - **Navigate to the project directory**:
