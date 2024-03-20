@@ -20,7 +20,7 @@ Before you begin, ensure you have met the following requirements:
   pip install django
   ```
 
-- **MySQL**: Your project uses MySQL as the database. Make sure you have MySQL installed and running. You can download it from [mysql.com](https://www.mysql.com/). You will also need mysqlclient.
+- **MySQL**: This project uses MySQL as the database. Make sure you have MySQL installed and running. You can download it from [mysql.com](https://www.mysql.com/). You will also need mysqlclient.
   ```
   pip install mysqlclient
   ```
